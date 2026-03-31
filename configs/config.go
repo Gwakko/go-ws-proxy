@@ -9,13 +9,15 @@ type Config struct {
 	Port           int
 	AllowedOrigins string
 	CommandTimeout int // seconds
+	AllowlistPath  string
 }
 
 func Load() *Config {
 	return &Config{
 		Port:           getEnvInt("PORT", 8080),
 		AllowedOrigins: getEnv("ALLOWED_ORIGINS", "*"),
-		CommandTimeout:  getEnvInt("COMMAND_TIMEOUT", 30),
+		CommandTimeout: getEnvInt("COMMAND_TIMEOUT", 30),
+		AllowlistPath:  getEnv("ALLOWLIST_PATH", "configs/allowlist.json"),
 	}
 }
 

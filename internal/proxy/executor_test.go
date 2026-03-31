@@ -7,7 +7,7 @@ import (
 )
 
 func TestAllowedCommandRunsSuccessfully(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	result, err := e.Run(context.Background(), "hostname")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -21,7 +21,7 @@ func TestAllowedCommandRunsSuccessfully(t *testing.T) {
 }
 
 func TestDisallowedCommandReturnsError(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	_, err := e.Run(context.Background(), "rm")
 	if err == nil {
 		t.Fatal("expected error for disallowed command, got nil")
@@ -32,7 +32,7 @@ func TestDisallowedCommandReturnsError(t *testing.T) {
 }
 
 func TestRunReturnsStdoutContent(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	result, err := e.Run(context.Background(), "whoami")
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
@@ -44,7 +44,7 @@ func TestRunReturnsStdoutContent(t *testing.T) {
 }
 
 func TestRunCapturesExitCodeOnFailure(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	result, err := e.Run(context.Background(), "ls", "/nonexistent_path_that_should_not_exist")
 	if err != nil {
 		t.Fatalf("expected no wrapper error for non-zero exit, got %v", err)
@@ -55,7 +55,7 @@ func TestRunCapturesExitCodeOnFailure(t *testing.T) {
 }
 
 func TestRunStreamSendsOutputThroughChannel(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	lines, errs := e.RunStream(context.Background(), "hostname")
 
 	var output strings.Builder
@@ -73,7 +73,7 @@ func TestRunStreamSendsOutputThroughChannel(t *testing.T) {
 }
 
 func TestRunStreamDisallowedCommand(t *testing.T) {
-	e := NewExecutor(5)
+	e := NewExecutor(5, []string{"ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"})
 	lines, errs := e.RunStream(context.Background(), "rm")
 
 	for range lines {

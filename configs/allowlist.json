@@ -1,0 +1,3 @@
+{
+  "commands": ["ping", "curl", "ls", "df", "uptime", "hostname", "whoami", "dig", "nslookup"]
+}

@@ -16,19 +16,25 @@ type Result struct {
 }
 
 type Executor struct {
-	timeout time.Duration
+	timeout         time.Duration
+	allowedCommands map[string]bool
 }
 
-func NewExecutor(timeoutSec int) *Executor {
+func NewExecutor(timeoutSec int, allowed []string) *Executor {
+	m := make(map[string]bool, len(allowed))
+	for _, cmd := range allowed {
+		m[cmd] = true
+	}
 	return &Executor{
-		timeout: time.Duration(timeoutSec) * time.Second,
+		timeout:         time.Duration(timeoutSec) * time.Second,
+		allowedCommands: m,
 	}
 }
 
 // Run executes a command and returns the result.
 // Only allows commands from a predefined allowlist for security.
 func (e *Executor) Run(ctx context.Context, name string, args ...string) (*Result, error) {
-	if !isAllowed(name) {
+	if !e.isAllowed(name) {
 		return nil, fmt.Errorf("command %q is not in the allowlist", name)
 	}
 
@@ -67,7 +73,7 @@ func (e *Executor) RunStream(ctx context.Context, name string, args ...string) (
 	lines := make(chan string, 100)
 	errs := make(chan error, 1)
 
-	if !isAllowed(name) {
+	if !e.isAllowed(name) {
 		go func() {
 			errs <- fmt.Errorf("command %q is not in the allowlist", name)
 			close(lines)
@@ -114,18 +120,6 @@ func (e *Executor) RunStream(ctx context.Context, name string, args ...string) (
 	return lines, errs
 }
 
-// allowlist of commands that can be executed via the proxy.
-// TODO: configure via config file or env var
-var allowedCommands = map[string]bool{
-	"ping":     true,
-	"curl":     true,
-	"ls":       true,
-	"df":       true,
-	"uptime":   true,
-	"hostname": true,
-	"whoami":   true,
-}
-
-func isAllowed(name string) bool {
-	return allowedCommands[name]
+func (e *Executor) isAllowed(name string) bool {
+	return e.allowedCommands[name]
 }
